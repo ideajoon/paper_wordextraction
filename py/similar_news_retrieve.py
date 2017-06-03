@@ -1,3 +1,4 @@
+from itertools import chain, combinations
 import configuration as config
 engine = config.get_engine()
 
@@ -16,15 +17,11 @@ def parse_article_idx(urls):
     news_idx = [idx for idx in news_idx if (idx[0] and idx[1])]
     return news_idx
 
-def iterate_keyword_combination(keywords_candidates):
-    def generate_index_combination(n):
-        index = [(i1, i2, i3) for i1 in range(n) for i2 in range(i1+1, n) for i3 in range(i2+1, n)]
-        for combination in index:
-            yield combination
-            
-    n = len(keywords_candidates)
-    for combination in generate_index_combination(n):
-        yield ' '.join([keywords_candidates[idx] for idx in combination])
+def iterate_keyword_combination(keywords_candidates, n_keywords):
+    if type(n_keywords) == int:
+        n_keywords = [n_keywords]
+    for keywords in chain(*[combinations(keywords_candidates, n) for n in n_keywords]):
+        yield ' '.join(keywords)
     
 def get_article_num_of_keywords(keywords_candidates, date):
     if len(keywords_candidates) < 3:
